@@ -125,18 +125,37 @@ int main(void)
 
         printf("ret = %x \n", ret);
 
-        ret = flash_sector_erase_4KByte(0x00);
+        ret = flash_sector_erase_4KByte(100);
         printf("erase ret = %d \n", ret);
 
-        spi_flash_write_data(0x00,write_buf,258);
-
-        ret = flash_read_data(0x00, read_buf, 50);
+			  ret = flash_read_data(0x00, read_buf, 500);
         printf("read ret = %d \n", ret);
 
-        for(uint8_t i = 0; i < 50; i++)
+        for(uint16_t i = 0; i < 500; i++)
         {
             printf("%X ", read_buf[i]);
         }
+			
+			
+			
+			
+			
+			
+			
+			
+        spi_flash_write_data(0,write_buf,258);
+
+			//flash_write_page(100,write_buf,256);
+			
+			
+        ret = flash_read_data(0x00, read_buf, 500);
+        printf("read ret = %d \n", ret);
+
+        for(uint16_t i = 0; i < 500; i++)
+        {
+            printf("%X ", read_buf[i]);
+        }
+
         printf("\n\n");
 
         HAL_Delay(1000);

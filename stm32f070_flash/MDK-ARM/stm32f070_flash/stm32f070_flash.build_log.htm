@@ -21,17 +21,23 @@ Target DLL:      Segger\JL2CM3.dll V2.99.31.0
 Dialog DLL:      TARMCM1.DLL V1.14.0.0
  
 <h2>Project:</h2>
-D:\mode_test\stm32f070_flash456\MDK-ARM\stm32f070_flash.uvprojx
+D:\mode_test\stm32_flash_demo\stm32f070_flash\MDK-ARM\stm32f070_flash.uvprojx
 Project File Date:  09/19/2019
 
 <h2>Output:</h2>
 *** Using Compiler 'V5.06 update 6 (build 750)', folder: 'H:\mdk\ARM\ARMCC\Bin'
 Build target 'stm32f070_flash'
 compiling main.c...
+compiling spi_flash.c...
+..\Src\spi_flash.c(377): warning:  #223-D: function "memcpy" declared implicitly
+      memcpy(&spi_tx_buf[4], pBuffer, WriteBytesNum);
+..\Src\spi_flash.c(363): warning:  #177-D: variable "flash_status"  was declared but never referenced
+      uint8_t flash_status;
+..\Src\spi_flash.c: 2 warnings, 0 errors
 linking...
-Program Size: Code=7740 RO-data=248 RW-data=16 ZI-data=2864  
+Program Size: Code=7788 RO-data=248 RW-data=16 ZI-data=2864  
 FromELF: creating hex file...
-"stm32f070_flash\stm32f070_flash.axf" - 0 Error(s), 0 Warning(s).
+"stm32f070_flash\stm32f070_flash.axf" - 0 Error(s), 2 Warning(s).
 
 <h2>Software Packages used:</h2>
 
@@ -54,7 +60,7 @@ Package Vendor: Keil
 <h2>Collection of Component Files used:</h2>
 
    * Component: ARM::CMSIS:CORE:5.1.2
-Build Time Elapsed:  00:00:02
+Build Time Elapsed:  00:00:05
 </pre>
 </body>
 </html>

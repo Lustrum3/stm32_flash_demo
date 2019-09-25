@@ -3,9 +3,9 @@
 <title>Static Call Graph - [stm32f070_flash\stm32f070_flash.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image stm32f070_flash\stm32f070_flash.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Thu Sep 19 10:25:39 2019
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Wed Sep 25 14:47:48 2019
 <BR><P>
-<H3>Maximum Stack Usage =        240 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
+<H3>Maximum Stack Usage =        248 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
 main &rArr; spi_flash_write_data &rArr; flash_write_page &rArr; flash_wait_busy &rArr; flash_read_Status &rArr; spi_read_data &rArr; HAL_SPI_Receive &rArr; HAL_SPI_TransmitReceive &rArr; SPI_EndRxTxTransaction &rArr; SPI_WaitFlagStateUntilTimeout
 <P>
@@ -279,8 +279,7 @@ Global Symbols
 </UL>
 
 <P><STRONG><a name="[30]"></a>HAL_GetTick</STRONG> (Thumb, 6 bytes, Stack size 0 bytes, stm32f0xx_hal.o(i.HAL_GetTick))
-<BR><BR>[Called By]<UL><LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_SPI_TransmitReceive
-<LI><a href="#[52]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SPI_WaitFlagStateUntilTimeout
+<BR><BR>[Called By]<UL><LI><a href="#[52]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SPI_WaitFlagStateUntilTimeout
 <LI><a href="#[53]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SPI_WaitFifoStateUntilTimeout
 <LI><a href="#[44]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_SPI_Transmit
 <LI><a href="#[41]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_SPI_Receive
@@ -290,6 +289,7 @@ Global Symbols
 <LI><a href="#[39]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RCCEx_PeriphCLKConfig
 <LI><a href="#[2f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_Delay
 <LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_WaitOnFlagUntilTimeout
+<LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_SPI_TransmitReceive
 </UL>
 
 <P><STRONG><a name="[54]"></a>HAL_IncTick</STRONG> (Thumb, 10 bytes, Stack size 0 bytes, stm32f0xx_hal.o(i.HAL_IncTick))
@@ -342,9 +342,9 @@ Global Symbols
 <P><STRONG><a name="[3a]"></a>HAL_RCC_ClockConfig</STRONG> (Thumb, 280 bytes, Stack size 24 bytes, stm32f0xx_hal_rcc.o(i.HAL_RCC_ClockConfig))
 <BR><BR>[Stack]<UL><LI>Max Depth = 76<LI>Call Chain = HAL_RCC_ClockConfig &rArr; HAL_RCC_GetSysClockFreq &rArr; __aeabi_uidivmod
 </UL>
-<BR>[Calls]<UL><LI><a href="#[30]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GetTick
-<LI><a href="#[32]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_InitTick
+<BR>[Calls]<UL><LI><a href="#[32]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_InitTick
 <LI><a href="#[3b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_RCC_GetSysClockFreq
+<LI><a href="#[30]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GetTick
 </UL>
 <BR>[Called By]<UL><LI><a href="#[55]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SystemClock_Config
 </UL>
@@ -394,9 +394,9 @@ Global Symbols
 <P><STRONG><a name="[41]"></a>HAL_SPI_Receive</STRONG> (Thumb, 344 bytes, Stack size 40 bytes, stm32f0xx_hal_spi.o(i.HAL_SPI_Receive))
 <BR><BR>[Stack]<UL><LI>Max Depth = 136<LI>Call Chain = HAL_SPI_Receive &rArr; HAL_SPI_TransmitReceive &rArr; SPI_EndRxTxTransaction &rArr; SPI_WaitFlagStateUntilTimeout
 </UL>
-<BR>[Calls]<UL><LI><a href="#[30]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GetTick
+<BR>[Calls]<UL><LI><a href="#[43]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SPI_EndRxTransaction
+<LI><a href="#[30]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GetTick
 <LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_SPI_TransmitReceive
-<LI><a href="#[43]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SPI_EndRxTransaction
 </UL>
 <BR>[Called By]<UL><LI><a href="#[5a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;spi_read_data
 </UL>
@@ -404,8 +404,8 @@ Global Symbols
 <P><STRONG><a name="[44]"></a>HAL_SPI_Transmit</STRONG> (Thumb, 368 bytes, Stack size 40 bytes, stm32f0xx_hal_spi.o(i.HAL_SPI_Transmit))
 <BR><BR>[Stack]<UL><LI>Max Depth = 88<LI>Call Chain = HAL_SPI_Transmit &rArr; SPI_EndRxTxTransaction &rArr; SPI_WaitFlagStateUntilTimeout
 </UL>
-<BR>[Calls]<UL><LI><a href="#[30]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GetTick
-<LI><a href="#[45]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SPI_EndRxTxTransaction
+<BR>[Calls]<UL><LI><a href="#[45]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SPI_EndRxTxTransaction
+<LI><a href="#[30]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GetTick
 </UL>
 <BR>[Called By]<UL><LI><a href="#[5f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;spi_write_data
 <LI><a href="#[5a]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;spi_read_data
@@ -414,8 +414,8 @@ Global Symbols
 <P><STRONG><a name="[42]"></a>HAL_SPI_TransmitReceive</STRONG> (Thumb, 584 bytes, Stack size 48 bytes, stm32f0xx_hal_spi.o(i.HAL_SPI_TransmitReceive))
 <BR><BR>[Stack]<UL><LI>Max Depth = 96<LI>Call Chain = HAL_SPI_TransmitReceive &rArr; SPI_EndRxTxTransaction &rArr; SPI_WaitFlagStateUntilTimeout
 </UL>
-<BR>[Calls]<UL><LI><a href="#[30]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GetTick
-<LI><a href="#[45]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SPI_EndRxTxTransaction
+<BR>[Calls]<UL><LI><a href="#[45]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SPI_EndRxTxTransaction
+<LI><a href="#[30]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GetTick
 </UL>
 <BR>[Called By]<UL><LI><a href="#[41]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_SPI_Receive
 </UL>
@@ -451,8 +451,8 @@ Global Symbols
 <P><STRONG><a name="[4b]"></a>HAL_UART_Transmit</STRONG> (Thumb, 200 bytes, Stack size 48 bytes, stm32f0xx_hal_uart.o(i.HAL_UART_Transmit))
 <BR><BR>[Stack]<UL><LI>Max Depth = 88<LI>Call Chain = HAL_UART_Transmit &rArr; UART_WaitOnFlagUntilTimeout
 </UL>
-<BR>[Calls]<UL><LI><a href="#[30]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GetTick
-<LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_WaitOnFlagUntilTimeout
+<BR>[Calls]<UL><LI><a href="#[4c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;UART_WaitOnFlagUntilTimeout
+<LI><a href="#[30]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_GetTick
 </UL>
 <BR>[Called By]<UL><LI><a href="#[25]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;fputc
 </UL>
@@ -621,8 +621,8 @@ Global Symbols
 <LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;flash_sector_erase_4KByte
 </UL>
 
-<P><STRONG><a name="[61]"></a>flash_write_page</STRONG> (Thumb, 66 bytes, Stack size 16 bytes, spi_flash.o(i.flash_write_page))
-<BR><BR>[Stack]<UL><LI>Max Depth = 216<LI>Call Chain = flash_write_page &rArr; flash_wait_busy &rArr; flash_read_Status &rArr; spi_read_data &rArr; HAL_SPI_Receive &rArr; HAL_SPI_TransmitReceive &rArr; SPI_EndRxTxTransaction &rArr; SPI_WaitFlagStateUntilTimeout
+<P><STRONG><a name="[61]"></a>flash_write_page</STRONG> (Thumb, 70 bytes, Stack size 24 bytes, spi_flash.o(i.flash_write_page))
+<BR><BR>[Stack]<UL><LI>Max Depth = 224<LI>Call Chain = flash_write_page &rArr; flash_wait_busy &rArr; flash_read_Status &rArr; spi_read_data &rArr; HAL_SPI_Receive &rArr; HAL_SPI_TransmitReceive &rArr; SPI_EndRxTxTransaction &rArr; SPI_WaitFlagStateUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[5e]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;flash_write_en
 <LI><a href="#[60]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;flash_wait_busy
@@ -639,8 +639,8 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> printf5.o(i.__0printf$5)
 </UL>
-<P><STRONG><a name="[22]"></a>main</STRONG> (Thumb, 148 bytes, Stack size 0 bytes, main.o(i.main))
-<BR><BR>[Stack]<UL><LI>Max Depth = 240<LI>Call Chain = main &rArr; spi_flash_write_data &rArr; flash_write_page &rArr; flash_wait_busy &rArr; flash_read_Status &rArr; spi_read_data &rArr; HAL_SPI_Receive &rArr; HAL_SPI_TransmitReceive &rArr; SPI_EndRxTxTransaction &rArr; SPI_WaitFlagStateUntilTimeout
+<P><STRONG><a name="[22]"></a>main</STRONG> (Thumb, 184 bytes, Stack size 0 bytes, main.o(i.main))
+<BR><BR>[Stack]<UL><LI>Max Depth = 248<LI>Call Chain = main &rArr; spi_flash_write_data &rArr; flash_write_page &rArr; flash_wait_busy &rArr; flash_read_Status &rArr; spi_read_data &rArr; HAL_SPI_Receive &rArr; HAL_SPI_TransmitReceive &rArr; SPI_EndRxTxTransaction &rArr; SPI_WaitFlagStateUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[65]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;spi_flash_write_data
 <LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;flash_sector_erase_4KByte
@@ -657,8 +657,8 @@ Global Symbols
 </UL>
 <BR>[Address Reference Count : 1]<UL><LI> entry9a.o(.ARM.Collect$$$$0000000B)
 </UL>
-<P><STRONG><a name="[65]"></a>spi_flash_write_data</STRONG> (Thumb, 60 bytes, Stack size 24 bytes, spi_flash.o(i.spi_flash_write_data))
-<BR><BR>[Stack]<UL><LI>Max Depth = 240<LI>Call Chain = spi_flash_write_data &rArr; flash_write_page &rArr; flash_wait_busy &rArr; flash_read_Status &rArr; spi_read_data &rArr; HAL_SPI_Receive &rArr; HAL_SPI_TransmitReceive &rArr; SPI_EndRxTxTransaction &rArr; SPI_WaitFlagStateUntilTimeout
+<P><STRONG><a name="[65]"></a>spi_flash_write_data</STRONG> (Thumb, 66 bytes, Stack size 24 bytes, spi_flash.o(i.spi_flash_write_data))
+<BR><BR>[Stack]<UL><LI>Max Depth = 248<LI>Call Chain = spi_flash_write_data &rArr; flash_write_page &rArr; flash_wait_busy &rArr; flash_read_Status &rArr; spi_read_data &rArr; HAL_SPI_Receive &rArr; HAL_SPI_TransmitReceive &rArr; SPI_EndRxTxTransaction &rArr; SPI_WaitFlagStateUntilTimeout
 </UL>
 <BR>[Calls]<UL><LI><a href="#[61]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;flash_write_page
 </UL>
@@ -706,8 +706,8 @@ Local Symbols
 <BR>[Calls]<UL><LI><a href="#[52]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SPI_WaitFlagStateUntilTimeout
 <LI><a href="#[53]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SPI_WaitFifoStateUntilTimeout
 </UL>
-<BR>[Called By]<UL><LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_SPI_TransmitReceive
-<LI><a href="#[44]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_SPI_Transmit
+<BR>[Called By]<UL><LI><a href="#[44]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_SPI_Transmit
+<LI><a href="#[42]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_SPI_TransmitReceive
 </UL>
 
 <P><STRONG><a name="[53]"></a>SPI_WaitFifoStateUntilTimeout</STRONG> (Thumb, 150 bytes, Stack size 24 bytes, stm32f0xx_hal_spi.o(i.SPI_WaitFifoStateUntilTimeout))

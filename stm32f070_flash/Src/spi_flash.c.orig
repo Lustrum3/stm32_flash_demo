@@ -85,10 +85,10 @@ void hal_spi_init(void)
 static uint8_t spi_read_data(uint8_t *tx_buf, uint16_t tx_len, uint8_t *rx_buf,  uint16_t rx_len)
 {
     ret_code_t ret_code;
-    uint8_t len = 0x00;
+		uint8_t len= 0x00;
     memcpy(spi_tx_buf, tx_buf, tx_len);
 
-    ret_code = nrf_drv_spi_transfer(&spi, spi_tx_buf, tx_len + rx_len, spi_rx_buf, tx_len + rx_len);
+    ret_code = nrf_drv_spi_transfer(&spi, spi_tx_buf, tx_len+rx_len, spi_rx_buf, tx_len+rx_len);
     if(ret_code != NRF_SUCCESS )
     {
         return SPI_ERROR;
@@ -242,7 +242,7 @@ uint8_t flash_write_en(void)
 * @brief  flash_read_Status  获取芯片状位
 * @param
 * @return
-* @note
+* @note   
 * @Sample
 **************************************************************/
 uint8_t flash_read_Status(void)
@@ -266,7 +266,7 @@ uint8_t flash_read_Status(void)
 * @brief  flash_wait_busy   等待flash 忙操作
 * @param
 * @return
-* @note
+* @note  
 * @Sample
 **************************************************************/
 uint8_t flash_wait_busy(void)
@@ -299,10 +299,10 @@ uint8_t flash_wait_busy(void)
 * @brief  flash_sector_erase_4KByte  擦除一个扇区
   * @param  uint32_t WriteAddr ַ
   * @return
-  * @note
+  * @note   
   * @Sample
 **************************************************************/
-uint8_t flash_sector_erase_4KByte(uint32_t WriteAddr)
+uint8_t flash_sector_erase_4KByte(uint32_t WriteAddr)   
 {
     uint8_t ret ;
     uint8_t len = 4;
@@ -329,7 +329,7 @@ uint8_t flash_sector_erase_4KByte(uint32_t WriteAddr)
 * @param  uint8_t *pBuffer  :读取缓冲区
 * @param  uint16_t length   :读取长度
 * @return
-* @note
+* @note   
 * @Sample
 **************************************************************/
 uint8_t flash_read_data(uint32_t ReadAddr, uint8_t *pBuffer,  uint16_t length)
@@ -362,11 +362,11 @@ uint8_t flash_write_page(uint32_t WriteAddr, uint8_t *pBuffer, uint16_t  WriteBy
     uint16_t len;
     uint8_t flash_status;
 
-    if(WriteAddr % SPI_FLASH_PAGE_SIZE + WriteBytesNum > 256)
-    {
-        return SPI_ERROR;
-    }
-
+		if(WriteAddr%SPI_FLASH_PAGE_SIZE+ WriteBytesNum >256)
+		{
+			return SPI_ERROR;
+		}
+	
     flash_write_en();
     spi_tx_buf[0] = PAGE_PROGRAM;
     spi_tx_buf[1] = (uint8_t)((WriteAddr & 0x00ff0000) >> 16);
@@ -385,59 +385,60 @@ uint8_t flash_write_page(uint32_t WriteAddr, uint8_t *pBuffer, uint16_t  WriteBy
 
 
 /***************************************************************
-* @brief  spi_flash_write_data  写任意数据打flash 中
-* @param  
-*					WriteAddr  ： 允许在flash 空间的任意地址
-*					pBuffer    ： 待写入数据buf
-*					NumByteToWrite :待写入数据长度
-* @return 
-* @note   falsh 
-* @Sample
+  * @brief  spi_flash_write_data  写任意数据打flash 中
+  * @param
+  * @return дС
+  * @note   falsh дС
+  * @Sample
 **************************************************************/
 uint8_t  spi_flash_write_data(uint32_t WriteAddr, uint8_t* pBuffer, uint16_t NumByteToWrite)
 {
-    uint8_t ret ;
-    int32_t residu_len = NumByteToWrite;                                   //未写入数据 长度
+	  uint8_t ret ;
+		int32_t residu_len = NumByteToWrite;                                //未写入数据 伤处
     uint16_t pageremain;
-    pageremain = SPI_FLASH_PAGE_SIZE - WriteAddr % SPI_FLASH_PAGE_SIZE;    //判断当前页剩余空间
-    if(residu_len <= pageremain)                                           //如果当前页剩余空间 大于待写入数据长度
+    pageremain = SPI_FLASH_PAGE_SIZE - WriteAddr % SPI_FLASH_PAGE_SIZE; //判断当前页剩余空间
+    if(residu_len <= pageremain)                                    //如果当前页剩余空间 大于待写入数据长度
     {
-        pageremain = residu_len; //256ֽ
-        ret = flash_write_page( WriteAddr, (void *)pBuffer, pageremain);
-        return ret;
+      pageremain = residu_len; //256ֽ
+			ret = flash_write_page( WriteAddr, (void *)pBuffer, pageremain);
+			return ret;
     }
-    else
-    {
-        while(1)
-        {
-            ret = flash_write_page( WriteAddr, (void *)pBuffer, pageremain); //写入数据
-            if(ret !=  SPI_OK)
-            {
-                return ret ;                                                 //如果写失败，直接return。
-            }
-            residu_len = residu_len - pageremain;                            //待写入数据剩余长度
+		else
+		{
+			while(1)
+			{
+					ret = flash_write_page( WriteAddr, (void *)pBuffer, pageremain);  //第一次将当前页写完
+					if(ret !=  SPI_OK)       
+					{
+						return ret ;                                                   //如果写失败，直接return。
+					}
+			
+					residu_len = residu_len - pageremain;                           //待写入数据剩余长度
+					
+					if(residu_len > 0)
+					{
+					
+							pBuffer += pageremain;                                     //数据指针偏移
+							WriteAddr += pageremain;                                   //写入数据flash地址偏移
 
-            if(residu_len > 0)
-            {
+							if(residu_len>SPI_FLASH_PAGE_SIZE)                         //如果剩余数据长度 大于一页大小
+							{
+								pageremain = SPI_FLASH_PAGE_SIZE;                        //写一整页数据
+							}
+							else
+							{
+								pageremain = residu_len;                                  //剩余长度 
+							}
+					}	
+					else
+					{
+						break;                                                      //写入完成         
+					}	
+			}
+		
+		}
 
-                pBuffer += pageremain;                                       //数据指针偏移
-                WriteAddr += pageremain;                                     //写入数据flash地址偏移
-
-                if(residu_len > SPI_FLASH_PAGE_SIZE)                         //如果剩余数据长度 大于一页大小
-                {
-                    pageremain = SPI_FLASH_PAGE_SIZE;                        //写一整页数据
-                }
-                else
-                {
-                    pageremain = residu_len;                                 //剩余长度
-                }
-            }
-            else
-            {
-                break;                                                       //写入完成
-            }
-        }
-    }
+   
     return ret;
 }
 

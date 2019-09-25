@@ -1,0 +1,422 @@
+/***************************************************************
+  * @file   spi_flash.c
+  * @brief  nor flash әطگ˽
+  * @author tao
+  * @version 1.00
+  * @date
+  **************************************************************/
+
+#ifdef FREERTOS
+#include "FreeRTOS.h"
+#include "task.h"
+#endif
+
+#include "stdint.h"
+#include "spi_flash.h"
+
+#define NRF52840 1
+#define STM32    2
+#define RT1050   3
+#define RT1020   4
+
+#define BOARD_TYPE STM32       //定于板子类型，根据不同类型编译
+
+
+
+uint8_t spi_tx_buf[300] = {0x00};
+uint8_t spi_rx_buf[300] = {0x00};
+
+
+#if (BOARD_TYPE == NRF52840)
+
+#include "app_uart.h"
+#include "nrf_log.h"
+
+#include "nrf_gpio.h"
+#include "nrf_drv_spi.h"
+#include "gpio.h"
+
+#define SPI_INSTANCE  2 /**< SPI instance index. */
+static volatile bool spi_xfer_done;  //
+static const nrf_drv_spi_t spi = NRF_DRV_SPI_INSTANCE(SPI_INSTANCE);  /**< SPI instance. */
+
+
+static void flash_delay(uint16_t num)
+{
+    vTaskDelay(2);
+}
+
+
+
+void spi_event_handler(nrf_drv_spi_evt_t const * p_event,
+                       void *                    p_context)
+{
+    spi_xfer_done = true;
+}
+
+
+/***************************************************************
+  * @brief  hal_spi_init
+  * @param
+  * @return
+  * @note   spi init
+  * @Sample
+**************************************************************/
+void hal_spi_init(void)
+{
+    nrf_drv_spi_config_t spi_config = NRF_DRV_SPI_DEFAULT_CONFIG;
+    spi_config.ss_pin   = SPI_SS_PIN;
+    spi_config.miso_pin = SPI_MISO_PIN;
+    spi_config.mosi_pin = SPI_MOSI_PIN;
+    spi_config.sck_pin  = SPI_SCK_PIN;
+    APP_ERROR_CHECK(nrf_drv_spi_init(&spi, &spi_config, NULL, NULL));
+}
+
+
+
+
+/***************************************************************
+  * @brief  spi_read_data
+  * @param  uint8_t addr
+  * @return uint8_t ȡbyte
+  * @note   ȡflash ַָ
+  * @Sample
+**************************************************************/
+static uint8_t spi_read_data(uint8_t *tx_buf, uint16_t tx_len, uint8_t *rx_buf,  uint16_t rx_len)
+{
+    ret_code_t ret_code;
+		uint8_t len= 0x00;
+    memcpy(spi_tx_buf, tx_buf, tx_len);
+
+    ret_code = nrf_drv_spi_transfer(&spi, spi_tx_buf, tx_len+rx_len, spi_rx_buf, tx_len+rx_len);
+    if(ret_code != NRF_SUCCESS )
+    {
+        return SPI_ERROR;
+    }
+    else
+    {
+        memcpy(rx_buf, &spi_rx_buf[tx_len], rx_len);
+        return SPI_OK;
+    }
+}
+
+
+/***************************************************************
+  * @brief  spi_write_one_Byte
+  * @param  uint8_t Data
+  * @return
+  * @note   spi һֽ
+  * @Sample
+**************************************************************/
+static uint8_t spi_write_data( uint8_t *write_buf, uint16_t length)
+{
+    ret_code_t ret_code;
+    memcpy(spi_tx_buf, write_buf, length);
+    ret_code  = nrf_drv_spi_transfer(&spi, spi_tx_buf, length, spi_rx_buf, length);
+    if(ret_code != NRF_SUCCESS )
+    {
+        return SPI_ERROR;
+    }
+    else
+    {
+        return SPI_OK;
+    }
+}
+
+#elif (BOARD_TYPE == STM32)
+
+#include "spi.h"
+#include "gpio.h"
+
+static void flash_delay(uint16_t num)
+{
+    HAL_Delay(num);
+}
+
+/***************************************************************
+  * @brief  spi_read_data  封装stm32 spi 读函数
+  * @param  uint8_t addr
+  * @return uint8_t
+  * @note
+  * @Sample
+**************************************************************/
+static uint8_t spi_read_data(uint8_t *tx_buf, uint16_t tx_len, uint8_t *rx_buf,  uint16_t rx_len)
+{
+    HAL_StatusTypeDef ret_code;
+
+    FLASH_CSEN();
+    HAL_SPI_Transmit(&hspi1, tx_buf, tx_len, W25Qx_TIMEOUT_VALUE);
+    ret_code = HAL_SPI_Receive(&hspi1, rx_buf, rx_len, W25Qx_TIMEOUT_VALUE);
+    FLASH_CSDIS();
+
+    if(ret_code != HAL_OK)
+    {
+        return SPI_ERROR;
+    }
+    else
+    {
+        return SPI_OK;
+    }
+}
+
+
+/***************************************************************
+  * @brief  spi_write_data   封装spi 写函数
+  * @param  uint8_t Data
+  * @return
+  * @note
+  * @Sample
+**************************************************************/
+static uint8_t spi_write_data( uint8_t *write_buf, uint16_t length)
+{
+
+    HAL_StatusTypeDef ret_code;
+    FLASH_CSEN();
+    ret_code = HAL_SPI_Transmit(&hspi1, write_buf, length, W25Qx_TIMEOUT_VALUE);
+    FLASH_CSDIS();
+    if(ret_code != HAL_OK )
+    {
+        return SPI_ERROR;
+    }
+    else
+    {
+        return SPI_OK;
+    }
+}
+#elif (BOARD_TYPE == RT1050)
+
+#endif
+
+
+
+
+
+
+/***************************************************************
+  * @brief  spi_flash_Rd_Id   读取spi flash 芯片设备id
+  * @param
+  * @return flash id
+  * @note
+  * @Sample
+**************************************************************/
+uint16_t  flash_read_id(void)
+{
+    uint16_t flash_id;
+    uint8_t ret;
+    uint8_t cmd[4] = {READ_FLASH_ID, 0xff, 0xff, 0xff};
+    ret = spi_read_data(cmd, 4, spi_rx_buf, 2);
+    if(ret == SPI_OK)
+    {
+        flash_id = (uint16_t)spi_rx_buf[1] * 256 + spi_rx_buf[0];
+        return flash_id;
+    }
+    else
+    {
+        return 0;
+    }
+
+
+}
+
+
+/***************************************************************
+  * @brief  uint8_t Data  写使能
+  * @param
+  * @return
+  * @note
+  * @Sample
+**************************************************************/
+
+uint8_t flash_write_en(void)
+{
+    uint8_t ret ;
+    uint16_t len = 0x01;
+    uint8_t cmd[4]  = {WRITE_ENABLE, 0XFF, 0XFF, 0XFF};
+    ret = spi_write_data( cmd, len);
+    return ret;
+}
+
+
+
+/***************************************************************
+* @brief  flash_read_Status  获取芯片状位
+* @param
+* @return
+* @note   
+* @Sample
+**************************************************************/
+uint8_t flash_read_Status(void)
+{
+
+    uint8_t ret;
+    uint8_t cmd[4] = {READ_STATUS_REGISTER, 0xff, 0xff, 0xff};
+    ret = spi_read_data(cmd, 2, spi_rx_buf, 2);
+    if(ret == SPI_OK)
+    {
+        return spi_rx_buf[0];
+    }
+    else
+    {
+        return 0;
+    }
+}
+
+
+/***************************************************************
+* @brief  flash_wait_busy   等待flash 忙操作
+* @param
+* @return
+* @note  
+* @Sample
+**************************************************************/
+uint8_t flash_wait_busy(void)
+{
+    uint16_t read_num = 0x00;
+    uint8_t flash_status = 0;
+    do
+    {
+        flash_status = flash_read_Status();
+        read_num++;
+        if(read_num > 200)
+        {
+            break;
+        }
+        flash_delay(2);
+    }
+    while(flash_status & 0x03);
+    if(flash_status & 0x03)
+    {
+        return SPI_BUSY;
+    }
+    else
+    {
+        return SPI_OK;
+    }
+}
+
+
+/***************************************************************
+* @brief  flash_sector_erase_4KByte  擦除一个扇区
+  * @param  uint32_t WriteAddr ַ
+  * @return
+  * @note   
+  * @Sample
+**************************************************************/
+uint8_t flash_sector_erase_4KByte(uint32_t WriteAddr)   
+{
+    uint8_t ret ;
+    uint8_t len = 4;
+
+    flash_write_en();
+
+    spi_tx_buf[0] = SECTOR_ERACE_4KB;
+    spi_tx_buf[1] = (uint8_t)((WriteAddr & 0x00ff0000) >> 16);
+    spi_tx_buf[2] = (uint8_t)((WriteAddr & 0x0000ff00) >> 8);
+    spi_tx_buf[3] = (uint8_t)WriteAddr;
+
+    ret = spi_write_data(spi_tx_buf, len);
+
+    ret = flash_wait_busy();
+
+    return ret ;
+
+}
+
+
+/***************************************************************
+* @brief  spi_flash_read  读取flash 数据
+* @param  uint32_t ReadAddr :读取地址
+* @param  uint8_t *pBuffer  :读取缓冲区
+* @param  uint16_t length   :读取长度
+* @return
+* @note   
+* @Sample
+**************************************************************/
+uint8_t flash_read_data(uint32_t ReadAddr, uint8_t *pBuffer,  uint16_t length)
+{
+    uint8_t ret ;
+    spi_tx_buf[0] = READ_DATA;
+    spi_tx_buf[1] = (uint8_t)((ReadAddr & 0x00ff0000) >> 16);
+    spi_tx_buf[2] = (uint8_t)((ReadAddr & 0x0000ff00) >> 8);
+    spi_tx_buf[3] = (uint8_t)ReadAddr;
+
+    ret = spi_read_data( spi_tx_buf, 4, pBuffer, length);
+
+    return ret ;
+}
+
+
+/***************************************************************
+* @brief  spi_flash_page_write   写数据，最大数据位一个 ，也就是256
+* @param  uint32_t WriteAddr : 起始地址
+* @param  uint8_t *pBuffer   : 数据缓冲区
+* @param  uint16_t WriteBytesNum :写数据长度  最大位256
+* @return
+* @note   flash дһpage
+* @Sample
+**************************************************************/
+
+uint8_t flash_write_page(uint32_t WriteAddr, uint8_t *pBuffer, uint16_t  WriteBytesNum )
+{
+    uint8_t ret ;
+    uint16_t len;
+    uint8_t flash_status;
+
+    if(WriteBytesNum > SPI_FLASH_PAGE_SIZE)
+    {
+        return 0;
+    }
+
+    flash_write_en();
+    spi_tx_buf[0] = PAGE_PROGRAM;
+    spi_tx_buf[1] = (uint8_t)((WriteAddr & 0x00ff0000) >> 16);
+    spi_tx_buf[2] = (uint8_t)((WriteAddr & 0x0000ff00) >> 8);
+    spi_tx_buf[3] = (uint8_t)WriteAddr;
+
+
+    memcpy(&spi_tx_buf[4], pBuffer, WriteBytesNum);
+    len = WriteBytesNum + 4;
+    ret = spi_write_data( spi_tx_buf,  len);
+
+    ret = flash_wait_busy();
+    return ret;
+}
+
+
+
+/***************************************************************
+  * @brief  spi_flash_write_data  写任意数据打flash 中
+  * @param
+  * @return дС
+  * @note   falsh дС
+  * @Sample
+**************************************************************/
+uint8_t  spi_flash_write_data(uint32_t WriteAddr, uint8_t* pBuffer, uint16_t NumByteToWrite)
+{
+    uint16_t pageremain;
+    pageremain = SPI_FLASH_PAGE_SIZE - WriteAddr % SPI_FLASH_PAGE_SIZE; //判断当前页剩余空间
+    if(NumByteToWrite <= pageremain)
+    {
+        pageremain = NumByteToWrite; //256ֽ
+    }
+
+    while(1)
+    {
+        flash_write_page( WriteAddr, (void *)pBuffer, pageremain);
+        if(NumByteToWrite == pageremain)break; //结束
+        else //NumByteToWrite>pageremain
+        {
+            pBuffer += pageremain;
+            WriteAddr += pageremain;
+
+            NumByteToWrite -= pageremain;         //计算剩余数据长度
+            if(NumByteToWrite > SPI_FLASH_PAGE_SIZE)pageremain = SPI_FLASH_PAGE_SIZE; //如果剩余长度大于一页大小
+            else pageremain = NumByteToWrite;     //256ֽ
+        }
+    }
+    return 1;
+}
+
+
+
+
